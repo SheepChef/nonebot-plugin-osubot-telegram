@@ -1,23 +1,28 @@
 import asyncio
 
 from nonebot import on_command
+from nonebot.typing import T_State
 from nonebot.params import CommandArg
 from nonebot_plugin_alconna import UniMessage
 from nonebot.internal.adapter import Event, Message
+import json
+import os
+
 
 from ..database import UserData
 from ..info import bind_user_info
+from .utils import split_msg
 
 bind = on_command("bind", priority=11, block=True)
 unbind = on_command("unbind", priority=11, block=True)
 lock = asyncio.Lock()
 
 
-@bind.handle()
-async def _bind(event: Event, name: Message = CommandArg()):
-    name = name.extract_plain_text().strip()
+@bind.handle(parameterless=[split_msg()])
+async def _bind(event: Event, state: T_State):
+    name = state["para"]
     if not name:
-        await UniMessage.text("请在指令后输入您的 osuid").finish(reply_to=True)
+        await UniMessage.text("请在指令后输入您的 osu用户名,例：\n/bind peppy").finish(reply_to=True)
     async with lock:
         if user := await UserData.get_or_none(user_id=event.get_user_id()):
             await UniMessage.text(f"您已绑定{user.osu_name}，如需要解绑请输入/unbind").finish(reply_to=True)
