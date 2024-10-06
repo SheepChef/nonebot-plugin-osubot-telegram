@@ -39,6 +39,17 @@ def split_msg():
         else:
             state["para"] = arg.strip()
         if " " in state["para"]:
+            if "@" in state["para"]:
+                templs = state["para"].split(" ")
+                templs2 = []
+                finalls = ''
+                for templss in templs:
+                    if "@" not in templss:
+                        templs2.append(templss)
+                    pass
+                finalls=" ".join(templs2)
+                state["para"] = finalls
+                pass
             ls = state["para"].split(" ")
             if state["_prefix"]["command"][0] in double_command:
                 state["para"] = ls[-1]
